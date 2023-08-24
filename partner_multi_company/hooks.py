@@ -10,13 +10,12 @@ except ImportError:
     _logger.info("Cannot find `base_multi_company` module in addons path.")
 
 
-def post_init_hook(cr, registry):
-    #hooks.post_init_hook(
-    #    cr,
-    #    "base.res_partner_rule",
-    #    "res.partner",
-    #)
+def set_security_rule(env, rule_ref):
+    """Set the condition for multi-company in the security rule.
 
+    :param: env: Environment
+    :param: rule_ref: XML-ID of the security rule to change.
+    """
     rule = env.ref(rule_ref)
     if not rule:  # safeguard if it's deleted
         return
@@ -29,6 +28,16 @@ def post_init_hook(cr, registry):
             ),
         }
     )
+
+def post_init_hook(cr, registry):
+    hooks.post_init_hook(
+        cr,
+        "base.res_partner_rule",
+        "res.partner",
+    )
+    with api.Environment.manage():
+        env = api.Environment(cr, SUPERUSER_ID, {})
+        set_security_rule(env, "base.res_partner_rule")
 
 
 def uninstall_hook(cr, registry):
