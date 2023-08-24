@@ -11,10 +11,23 @@ except ImportError:
 
 
 def post_init_hook(cr, registry):
-    hooks.post_init_hook(
-        cr,
-        "base.res_partner_rule",
-        "res.partner",
+    #hooks.post_init_hook(
+    #    cr,
+    #    "base.res_partner_rule",
+    #    "res.partner",
+    #)
+
+    rule = env.ref(rule_ref)
+    if not rule:  # safeguard if it's deleted
+        return
+    rule.write(
+        {
+            "active": True,
+            "domain_force": (
+                "['|', '|', ('no_company_ids', '=', True), ('company_ids', "
+                "'in', company_ids), ('user_ids', '!=', False)]"
+            ),
+        }
     )
 
 
