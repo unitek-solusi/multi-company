@@ -24,6 +24,8 @@ class ResPartner(models.Model):
         removed in the inheritance, and that will activate the inverse method,
         overwriting our company_ids field desired value.
         """
+        if "company_ids" not in vals or vals["company_ids"] == False:
+            vals["company_ids"] = [(6,0, [self.env.company.id, ]),]  #active company as default
         vals = self._amend_company_id(vals)
         return super().create(vals)
 
